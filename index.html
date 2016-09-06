@@ -7,6 +7,7 @@
 
     var dictionary = [];
     dictionary.push({code: 'contact', url: 'http://jonathandamico.me/contact'});
+    dictionary.push({code: '', url: 'http://jonathandamico.me/'});
     dictionary.forEach(function(entry) {
       if(entry.code==getURLParameter('code'))
         window.location = entry.url;
