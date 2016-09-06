@@ -1,4 +1,15 @@
 <head>
-  <script type="text/javascript" src="js.js"></script>
   <title>Redirecting</title>
+  <script>
+    function getURLParameter(name) {
+      return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+    }
+
+    var dictionary = [];
+    dictionary.push({code: 'contact', url: 'http://jonathandamico.me/contact'});
+    dictionary.forEach(function(entry) {
+      if(entry.code==getURLParameter('code'))
+        window.location = entry.url;
+    });
+  </script>
 </head>
