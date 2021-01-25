@@ -36,6 +36,8 @@
     dictionary.push({code: 'sq', url: 'https://citymapper.com/london/tube/stations/sloane-square'});
     dictionary.push({code: 'kb', url: 'https://citymapper.com/london/t/knightsbridge'});
     dictionary.push({code: 'covid', url: 'https://jonathandamico.me/UK-Covid-2-Nov.pdf'});
+    dictionary.push({code: 'ukcovid', url: 'https://coronavirus.data.gov.uk'});
+    dictionary.push({code: 'akkotrack', url: 'http://track.4px.com/queryBatch/420902729261290249338723354167?locale=en_US'});
     dictionary.forEach(function(entry) {
       if(entry.code==getURLParameter('code'))
         window.location = entry.url;
