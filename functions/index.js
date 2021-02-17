@@ -45,7 +45,7 @@ exports.redirect = functions.https.onRequest((request, response) => {
   if(request.url == "/") { //Special case if there is no key passed (i.e. user just goes to jdami.co plain)
     var redirectURL = "https://jonathandamico.me"
     response.redirect(301, redirectURL);
-    console.log("Redirected jdami.co/" + key + " to " + redirectURL);
+    console.log("Redirected jdami.co/" + " to " + redirectURL);
     admin.database().ref("/analytics/jonathandamico-me/").push({
       requestTime: (new Date()).getTime(),
       headers: request.headers

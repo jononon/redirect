@@ -5,42 +5,8 @@
       return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
     }
 
-    var dictionary = [];
-    dictionary.push({code: null, url: 'https://jonathandamico.me/'});
-    dictionary.push({code: 'contact', url: 'https://jonathandamico.me/contact'});
-    dictionary.push({code: '', url: 'https://jonathandamico.me/'});
-    dictionary.push({code: 'incxpand', url: 'http://doodle.com/poll/gkxre8iwarzrw7ak'});
-    dictionary.push({code: 'backpacksurvey', url:'https://jonathandamico.typeform.com/to/tfyKHs'});
-    dictionary.push({code: 'sonosapp', url:'http://www.sonos.com/en-us/controller-app'});
-    dictionary.push({code: 'wifi', url:'http://jonathandamico.me/wifi'});
-    dictionary.push({code: 'ihwscreenshots', url:'https://drive.google.com/open?id=0B00N5l226z8MTk5JSC0wNGd6Slk'});
-    dictionary.push({code: 'startupjamdoodle', url:'http://doodle.com/poll/3zeyqmcxhb3ebnuw'});
-    dictionary.push({code: 'wasc', url:'https://docs.google.com/a/hw.com/document/d/1zi7PcVm2nM0dC9CYh-EZuj1sSmt9v1z0LcJV3UNBULQ/edit?usp=sharing'});
-    dictionary.push({code: 'ihwbeta', url:'https://docs.google.com/forms/d/e/1FAIpQLSdoRsvqX7FcNEwO735-LZL-QwPDvX7n8x1uUJyFPWAYDzn9aw/viewform'});
-    dictionary.push({code: 'iso3103', url:'https://en.wikipedia.org/wiki/ISO_3103'});
-    dictionary.push({code: 'solos', url:'https://docs.google.com/a/hw.com/spreadsheets/d/1foH_56k8OVgF8zQpSCpcVwvXmvMrKUdF_JTLUX72LMM/edit?usp=sharing'});
-    dictionary.push({code: 'resume', url:"http://jonathandamico.me/resume"});
-    dictionary.push({code: 'COAA', url: "https://join.skype.com/K0yFQFrfXuc4"});
-    dictionary.push({code: 'PLAU', url: "https://imgur.com/a/fw4h4"});
-    dictionary.push({code: 'HistoryLesson', url: "https://imgur.com/a/3mJnC"});
-    dictionary.push({code: 'tbolscores', url: 'https://docs.google.com/a/hwemail.com/spreadsheets/d/e/2PACX-1vRNgoi8lyg5HTs-7f5FsAukqG0a6nPckGZRBOfltPZWcUwvjqJE04JOoxp6y6Z1YBSbIGSE_CnUbf5u/pubchart?oid=272550841&format=interactive'});
-    dictionary.push({code: 'schedule', url: 'http://jonathandamico.me/schedule'});
-    dictionary.push({code: 'github', url: 'https://github.com/jononon'});
-    dictionary.push({code: 'sceduedule', url: 'http://jonathandamico.me/schedule'});
-    dictionary.push({code: 'stamps', url: 'https://jonathandamico.me/stamps'});
-    dictionary.push({code: 'incvoice', url: 'https://youtu.be/Z6j9wyjDm1Q'});
-    dictionary.push({code: 'dudleydisplay', url: 'https://jonathandamico.me/dudleydisplay'});
-    dictionary.push({code: 'linkedin', url: 'https://www.linkedin.com/in/jonathandamico/'});
-    dictionary.push({code: 'zoom', url: 'https://us02web.zoom.us/j/7098318897?pwd=QWNqWHpBbEVVTWt5SFQza2p2QVNnZz09'});
-    dictionary.push({code: 'kirutasks', url: 'https://app.mural.co/t/kiru9484/m/kiru9484/1593722293348/86eac0788c623272b97d9d96c1e33a0f45d3712e'});
-    dictionary.push({code: 'sq', url: 'https://citymapper.com/london/tube/stations/sloane-square'});
-    dictionary.push({code: 'kb', url: 'https://citymapper.com/london/t/knightsbridge'});
-    dictionary.push({code: 'covid', url: 'https://jonathandamico.me/UK-Covid-2-Nov.pdf'});
-    dictionary.push({code: 'ukcovid', url: 'https://coronavirus.data.gov.uk'});
-    dictionary.push({code: 'akkotrack', url: 'http://track.4px.com/queryBatch/420902729261290249338723354167?locale=en_US'});
-    dictionary.forEach(function(entry) {
-      if(entry.code==getURLParameter('code'))
-        window.location = entry.url;
-    });
+    //Redirect from old redirect service to new redirect service.
+    window.location = "https://jdami.co/" + getURLParameter('code');
+
   </script>
 </head>
