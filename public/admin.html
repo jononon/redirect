@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-functions.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-auth.js"></script>
+
+    <title>Kiru URL Shortener</title>
+  </head>
+  <body>
+    <div id="main" class="container" style="display:none;">
+      <h1>Kiru URL Shortener</h1>
+      <div id="alerts">
+      </div>
+      <form>
+        <div class="mb-3">
+          <label for="longURL" class="form-label">Enter URL to Shorten</label>
+          <input type="text" class="form-control" id="longURL" placeholder="https://kiru.com/long/url/to/shorten">
+        </div>
+        <div class="mb-3">
+          <label for="key" class="form-label">Enter custom shortlink</label>
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="basic-addon3">go.kiru.com/</span>
+            <input type="text" class="form-control" id="key" placeholder="shortlink">
+            
+            <button id="randomizeSpinnerButton" class="btn btn-secondary" type="button" disabled style="display:none;">
+              <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+              <span class="visually-hidden">Loading...</span>
+            </button>
+            <button id="randomizeButton" class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="randomize()">Randomize</button>
+
+            <!-- <div id="characterCount" class="form-text">Shortlink character count: <span id="characterCountNumber"></span></div> -->
+          </div>
+
+        </div>
+
+        <button id="submitSpinnerButton" class="btn btn-primary" type="button" disabled style="display:none;">
+          <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+          <span class="visually-hidden">Loading...</span>
+        </button>
+        <button id="submitButton" type="button" class="btn btn-primary" onclick="shorten()">Submit</button>
+
+      </form>
+      <br>
+      <h3>Shortened URLs</h3>
+      <div id="list">
+      </div>
+      <br><br>
+      <div id="logOutButton">
+        <p class="text-end"><a role="button" class="btn btn-outline-secondary btn-sm" href="https://go.kiru.com/shortlinkdocs">Help / Software Documentation</a> <button type="button" class="btn btn-outline-secondary btn-sm" onclick="logOut()">Log Out</button></p>
+      </div>
+    </div>
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js" integrity="sha384-KsvD1yqQ1/1+IA7gi3P0tyJcT3vR+NdBTt13hSJ2lnve8agRGXTTyNaBYmCR/Nwi" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.min.js" integrity="sha384-nsg8ua9HAw1y0W1btsyWgBklPnCUAFLuTMS2G72MMONqmOymq585AcH49TLBQObG" crossorigin="anonymous"></script>
+    -->
+  </body>
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyA67bb7NRGee12Y5SSxqRPtq7BQQOmz-AE",
+      authDomain: "redirect-5c8c2.firebaseapp.com",
+      databaseURL: "https://redirect-5c8c2-default-rtdb.firebaseio.com",
+      projectId: "redirect-5c8c2",
+      storageBucket: "redirect-5c8c2.appspot.com",
+      messagingSenderId: "836247150483",
+      appId: "1:836247150483:web:da8bd375f62c7a4419d266"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        console.log(user);
+        $("#main").show();
+      } else {
+        window.location = "login.html";
+      }
+    });
+
+    function gup(name, url) {
+      name = name.replace(/[\[]/, '\\\[').replace(/[\]]/, '\\\]');
+      var results = new RegExp('[?&]'+name+'=?([^&#]*)').exec(url || window.location.href);
+      return results == null ? null : results[1] || true;
+    }
+
+    function makeId(length) {
+      var result           = '';
+      var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      var charactersLength = characters.length;
+      for ( var i = 0; i < length; i++ ) {
+         result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+      return result;
+    }
+
+    function isValidHttpUrl(string) {
+      var regex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gm;
+      return regex.test(string);
+    }
+
+    function randomize() {
+      $("#randomizeSpinnerButton").show()
+      $("#randomizeButton").hide()
+      var key = generateRandomID(4);
+      
+    }
+
+    function generateRandomID(length) {
+      var checkForConflict = firebase.functions().httpsCallable('checkForConflict');
+      var generatedKey = makeId(length);
+
+      checkForConflict({key: generatedKey}).then(function(result) {
+        if(result.result)
+          return generateRandomID(length + 1);
+        else {
+          $("#key").val(generatedKey);
+          $("#randomizeSpinnerButton").hide()
+          $("#randomizeButton").show()
+          return generatedKey;
+        }
+      });
+    }
+
+    function shorten() {
+
+      $("#shortenSpinnerButton").show()
+      $("#shortenButton").hide()
+
+      var shortenURL = firebase.functions().httpsCallable('shortenURL');
+
+      var keyInput = $("#key").val();
+      var urlInput = $("#longURL").val();
+
+      if(keyInput == "" || urlInput == "") {
+        $("#alerts").append(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Please ensure that all fields have been filled.</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>`);
+      } else if(/[^a-zA-Z1-9-]/g.test(keyInput)) {
+        $("#alerts").append(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Please ensure that there are no spaces or special characters in the shortlink.</strong> Shortlinks must only contain letters and numbers.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>`);
+      } else if(!isValidHttpUrl(urlInput)) {
+        $("#alerts").append(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Please ensure that the URL is valid.</strong> Ensure that the URL starts with http:// or https:// and does not contain any spaces.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>`);
+      } else {
+
+        shortenURL({key: keyInput, url: urlInput}).then(function(result) {
+          if(result.data) {
+            $("#alerts").append(`<div class="alert alert-success alert-dismissible fade show" role="alert">
+              <strong>Success!</strong> <a href="${urlInput}">${urlInput}</a> has been shortened to <a href="https://go.kiru.com/${keyInput}">go.kiru.com/${keyInput}</a>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`);
+          } else {
+            $("#alerts").append(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
+              <strong>The shortlink you have entered has been taken.</strong> Please choose another shortlink.
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`);
+          }
+
+          $("#key").val("");
+          $("#longURL").val("");
+          getList();
+          $("#shortenSpinnerButton").hide()
+          $("#shortenButton").show()
+        });
+      }
+    }
+
+    function removeShortlink(key) {
+      var removeShortlinkFirebase = firebase.functions().httpsCallable('removeShortlink');
+
+      removeShortlinkFirebase({key: key}).then(function(result) {
+        var data = result.data;
+        if(result.data == false) {
+          $("#alerts").append(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
+              <strong>Shortlink removal failed.</strong>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`);
+        } else {
+          $("#alerts").append(`<div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Success!</strong> Shortlink go.kiru.com/${key} which redirected to <a href="${result.data}">${result.data}</a> has been removed.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>`);
+        }
+        getList();
+      });
+    }
+
+    function getList() {
+      var getListFirebase = firebase.functions().httpsCallable('getList');
+      
+      getListFirebase({}).then(function(result) {
+
+        var tableHTML = `<table class="table align-middle"><thead><tr><th scope="col">Shortlink</th><th scope="col">URL</th><th scope="col"></th></thead><tbody>`;
+
+        for(var shortlink in result.data) {
+          tableHTML += `<tr><td class="text-break"><span id="sl-${shortlink}">go.kiru.com/${shortlink}</span></td><td class="text-break"><a href="${result.data[shortlink]}">${result.data[shortlink]}</a></td><td><button type="button" class="btn btn-outline-dark btn-sm" onclick="copyToClipboard('#sl-${shortlink}')">Copy Shortlink</button> <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeShortlink('${shortlink}')">Delete</button></td></tr>`;
+        }
+
+        tableHTML += `</tbody></table>`;
+        $("#list").html(tableHTML);
+
+      });
+    }
+
+    function copyToClipboard(element) {
+      var $temp = $("<input>");
+      $("body").append($temp);
+      $temp.val($(element).text()).select();
+      document.execCommand("copy");
+      $temp.remove();
+    }
+
+    function logOut() {
+      firebase.auth().signOut().then(() => {
+        // Sign-out successful.
+      }).catch((error) => {
+        console.log(error);
+        $("#alerts").append(`<div class="alert alert-warning alert-dismissible fade show" role="alert">
+              <strong>Error signing out.</strong> ${error}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`);
+      });
+    }
+
+    // function updateCharacterCounter() {
+    //   if($("#key").val() == "") {
+    //     $("#characterCount").hide();
+    //   } else {
+    //     var count = "go.kiru.com/".length + $("#key").val().length;
+    //     $("#characterCountNumber").html(count);
+    //     $("#characterCount").show();
+    //   }
+    // }
+
+
+    getList();
+
+  </script>
+</html>

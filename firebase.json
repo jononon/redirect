@@ -5,6 +5,25 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "rewrites": [
+      {
+        "source": "*/admin*",
+        "destination": "/admin.html"
+      },
+      {
+        "source": "*/404*",
+        "destination": "/404.html"
+      },
+      {
+        "source": "*/login*",
+        "destination": "/login.html"
+      },
+      {
+        "source": "**",
+        "function": "redirect"
+      }
     ]
   }
 }
