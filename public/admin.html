@@ -14,22 +14,22 @@
     <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-functions.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.2.7/firebase-auth.js"></script>
 
-    <title>Kiru URL Shortener</title>
+    <title>Redirect</title>
   </head>
   <body>
     <div id="main" class="container" style="display:none;">
-      <h1>Kiru URL Shortener</h1>
+      <h1>Redirect</h1>
       <div id="alerts">
       </div>
       <form>
         <div class="mb-3">
           <label for="longURL" class="form-label">Enter URL to Shorten</label>
-          <input type="text" class="form-control" id="longURL" placeholder="https://kiru.com/long/url/to/shorten">
+          <input type="text" class="form-control" id="longURL" placeholder="https://site.com/long/url/to/shorten">
         </div>
         <div class="mb-3">
           <label for="key" class="form-label">Enter custom shortlink</label>
           <div class="input-group mb-3">
-            <span class="input-group-text" id="basic-addon3">go.kiru.com/</span>
+            <span class="input-group-text" id="basic-addon3">jdami.co/</span>
             <input type="text" class="form-control" id="key" placeholder="shortlink">
             
             <button id="randomizeSpinnerButton" class="btn btn-secondary" type="button" disabled style="display:none;">
@@ -56,7 +56,7 @@
       </div>
       <br><br>
       <div id="logOutButton">
-        <p class="text-end"><a role="button" class="btn btn-outline-secondary btn-sm" href="https://go.kiru.com/shortlinkdocs">Help / Software Documentation</a> <button type="button" class="btn btn-outline-secondary btn-sm" onclick="logOut()">Log Out</button></p>
+        <p class="text-end"><a role="button" class="btn btn-outline-secondary btn-sm" href="https://jdami.co/shortlinkdocs">Help / Software Documentation</a> <button type="button" class="btn btn-outline-secondary btn-sm" onclick="logOut()">Log Out</button></p>
       </div>
     </div>
 
@@ -167,7 +167,7 @@
         shortenURL({key: keyInput, url: urlInput}).then(function(result) {
           if(result.data) {
             $("#alerts").append(`<div class="alert alert-success alert-dismissible fade show" role="alert">
-              <strong>Success!</strong> <a href="${urlInput}">${urlInput}</a> has been shortened to <a href="https://go.kiru.com/${keyInput}">go.kiru.com/${keyInput}</a>
+              <strong>Success!</strong> <a href="${urlInput}">${urlInput}</a> has been shortened to <a href="https://jdami.co/${keyInput}">jdami.co/${keyInput}</a>
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>`);
           } else {
@@ -198,7 +198,7 @@
             </div>`);
         } else {
           $("#alerts").append(`<div class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong>Success!</strong> Shortlink go.kiru.com/${key} which redirected to <a href="${result.data}">${result.data}</a> has been removed.
+            <strong>Success!</strong> Shortlink jdami.co/${key} which redirected to <a href="${result.data}">${result.data}</a> has been removed.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>`);
         }
@@ -214,7 +214,7 @@
         var tableHTML = `<table class="table align-middle"><thead><tr><th scope="col">Shortlink</th><th scope="col">URL</th><th scope="col"></th></thead><tbody>`;
 
         for(var shortlink in result.data) {
-          tableHTML += `<tr><td class="text-break"><span id="sl-${shortlink}">go.kiru.com/${shortlink}</span></td><td class="text-break"><a href="${result.data[shortlink]}">${result.data[shortlink]}</a></td><td><button type="button" class="btn btn-outline-dark btn-sm" onclick="copyToClipboard('#sl-${shortlink}')">Copy Shortlink</button> <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeShortlink('${shortlink}')">Delete</button></td></tr>`;
+          tableHTML += `<tr><td class="text-break"><span id="sl-${shortlink}">jdami.co/${shortlink}</span></td><td class="text-break"><a href="${result.data[shortlink]}">${result.data[shortlink]}</a></td><td><button type="button" class="btn btn-outline-dark btn-sm" onclick="copyToClipboard('#sl-${shortlink}')">Copy Shortlink</button> <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeShortlink('${shortlink}')">Delete</button></td></tr>`;
         }
 
         tableHTML += `</tbody></table>`;
@@ -247,7 +247,7 @@
     //   if($("#key").val() == "") {
     //     $("#characterCount").hide();
     //   } else {
-    //     var count = "go.kiru.com/".length + $("#key").val().length;
+    //     var count = "jdami.co/".length + $("#key").val().length;
     //     $("#characterCountNumber").html(count);
     //     $("#characterCount").show();
     //   }

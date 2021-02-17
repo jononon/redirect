@@ -12,25 +12,6 @@ admin.initializeApp();
 //   response.send("Hello from Firebase!");
 // });
 
-exports.shortenURLs = functions.https.onCall((data, context) => {
-  if(context.auth == undefined) {
-    return false;
-  } else {
-    var keys = [];
-    return admin.database().ref("/shortenedURLs/").once('value').then(snapshot => {
-      for (var i = 0; i < data.urls.length; i++) {
-        var key;
-        do {
-          key = makeId(8);
-        } while(snapshot.val() == undefined ? false : snapshot.val()[key] != undefined);
-        admin.database().ref("/shortenedURLs/" + key).set(data.urls[i]);
-        keys.push("https://go.kiru.com/?r="+key);
-      }
-      return keys;
-    });
-  }
-});
-
 exports.shortenURL = functions.https.onCall((data, context) => {
   if(context.auth == undefined) {
     return false;
@@ -61,21 +42,31 @@ exports.checkForConflict = functions.https.onCall((data, context) => {
 });
 
 exports.redirect = functions.https.onRequest((request, response) => {
-  var key = request.url.substring(1);
-  return admin.database().ref("/shortenedURLs/" + key).once('value').then(snapshot => {
-    if(snapshot.exists()) {
-      var redirectURL = snapshot.val();
-      response.redirect(301, redirectURL);   
-      console.log("Redirected go.kiru.com/" + key + " to " + redirectURL);
-      admin.database().ref("/analytics/" + key).push({
-        requestTime: (new Date()).getTime(),
-        headers: request.headers
-      });   
-    } else {
-      response.redirect(301, "https://go.kiru.com/404");
-      console.log("Failed to redirect go.kiru.com/" + key + " . No key existed");
-    }
-  });
+  if(request.url == "/") { //Special case if there is no key passed (i.e. user just goes to jdami.co plain)
+    var redirectURL = "https://jonathandamico.me"
+    response.redirect(301, redirectURL);
+    console.log("Redirected jdami.co/" + key + " to " + redirectURL);
+    admin.database().ref("/analytics/jonathandamico-me/").push({
+      requestTime: (new Date()).getTime(),
+      headers: request.headers
+    });  
+  } else {
+    var key = request.url.substring(1);
+    return admin.database().ref("/shortenedURLs/" + key).once('value').then(snapshot => {
+      if(snapshot.exists()) {
+        var redirectURL = snapshot.val();
+        response.redirect(301, redirectURL);   
+        console.log("Redirected jdami.co/" + key + " to " + redirectURL);
+        admin.database().ref("/analytics/" + key).push({
+          requestTime: (new Date()).getTime(),
+          headers: request.headers
+        });   
+      } else {
+        response.redirect(301, "https://jdami.co/404");
+        console.log("Failed to redirect jdami.co/" + key + " . No key existed");
+      }
+    });
+  }
 });
 
 exports.getIPInfo = functions.database.ref("/analytics/{key}/{instanceID}/").onCreate((snapshot, context) => {
