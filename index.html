@@ -6,7 +6,11 @@
     }
 
     //Redirect from old redirect service to new redirect service.
-    window.location = "https://jdami.co/" + getURLParameter('code');
+    var key = getURLParameter('code');
+    if(key == null) {
+        key = "";
+    }
+    window.location = "https://jdami.co/" + key;
 
   </script>
 </head>
