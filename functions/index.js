@@ -41,6 +41,26 @@ exports.checkForConflict = functions.https.onCall((data, context) => {
   }
 });
 
+function sendMessage(messageBody) {
+  var messageOptions = {
+    'method': 'POST',
+    'url': 'https://api.twilio.com/2010-04-01/Accounts/AC124178576b17a1499b948f2af191b13b/Messages.json',
+    'headers': {
+      'Authorization': `Basic ${functions.config().twilio.authheaderkey}`
+    },
+    formData: {
+      'Body': messageBody,
+      'From': '+13238971709',
+      'To': '+13109137582'
+    }
+  };
+  return rp(messageOptions);
+}
+
+function sendTextAlert(key, location, region, country) {
+  return sendMessage(`Redir :: Key ${key} :: Location ${location}, ${region}, ${country}`);
+}
+
 exports.redirect = functions.https.onRequest((request, response) => {
   if(request.url == "/") { //Special case if there is no key passed (i.e. user just goes to jdami.co plain)
     var redirectURL = "https://jonathandamico.me"
@@ -49,7 +69,7 @@ exports.redirect = functions.https.onRequest((request, response) => {
     admin.database().ref("/analytics/jonathandamico-me/").push({
       requestTime: (new Date()).getTime(),
       headers: request.headers
-    });  
+    });
   } else {
     var key = request.url.substring(1);
     return admin.database().ref("/shortenedURLs/" + key).once('value').then(snapshot => {
@@ -79,7 +99,9 @@ exports.getIPInfo = functions.database.ref("/analytics/{key}/{instanceID}/").onC
     }
   };
   return rp(options).then(function (body){
-    return admin.database().ref(`/analytics/${context.params.key}/${context.params.instanceID}/ipInfo/`).set(JSON.parse(body));
+    var jsonBody = JSON.parse(body);
+    sendTextAlert(context.params.key, jsonBody.city, jsonBody.region, jsonBody.countryCode);
+    return admin.database().ref(`/analytics/${context.params.key}/${context.params.instanceID}/ipInfo/`).set(jsonBody);
   });
 
 });
