@@ -58,7 +58,12 @@ function sendMessage(messageBody) {
 }
 
 function sendTextAlert(key, location, region, country) {
-  return sendMessage(`Redir :: Key ${key} :: Location ${location}, ${region}, ${country}`);
+  var message = `Redir :: Key ${key} :: Location ${location}, `;
+  if(region != "") {
+    message += `${region}, `;
+  }
+  message += country;
+  return sendMessage(message);
 }
 
 exports.redirect = functions.https.onRequest((request, response) => {
@@ -100,7 +105,7 @@ exports.getIPInfo = functions.database.ref("/analytics/{key}/{instanceID}/").onC
   };
   return rp(options).then(function (body){
     var jsonBody = JSON.parse(body);
-    sendTextAlert(context.params.key, jsonBody.city, jsonBody.region, jsonBody.countryCode);
+    sendTextAlert(context.params.key, jsonBody.city, jsonBody.region, jsonBody.country);
     return admin.database().ref(`/analytics/${context.params.key}/${context.params.instanceID}/ipInfo/`).set(jsonBody);
   });
 
